@@ -2,7 +2,7 @@ local typedefs = require "kong.db.schema.typedefs"
 
 
 return {
-  name = "service-callout",
+  name = "kong-service-callout",
   fields = {
     { config = 
       {
