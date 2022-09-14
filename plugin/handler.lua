@@ -17,65 +17,19 @@ local serviceCallout = {
   VERSION = "0.1", -- version in X.Y.Z format. Check hybrid-mode compatibility requirements.
 }
 
-
-
--- do initialization here, any module level code runs in the 'init_by_lua_block',
--- before worker processes are forked. So anything you add here will run once,
--- but be available in all workers.
-
-
-
--- handles more initialization, but AFTER the worker process has been forked/created.
--- It runs in the 'init_worker_by_lua_block'
 function serviceCallout:init_worker()
-
-  -- your custom code here
   kong.log.debug("saying hi from the 'init_worker' handler")
+end
 
-end --]]
-
-
-
---[[ runs in the 'ssl_certificate_by_lua_block'
--- IMPORTANT: during the `certificate` phase neither `route`, `service`, nor `consumer`
--- will have been identified, hence this handler will only be executed if the plugin is
--- configured as a global plugin!
-function plugin:certificate(plugin_conf)
-
-  -- your custom code here
-  kong.log.debug("saying hi from the 'certificate' handler")
-
-end --]]
-
-
-
---[[ runs in the 'rewrite_by_lua_block'
--- IMPORTANT: during the `rewrite` phase neither `route`, `service`, nor `consumer`
--- will have been identified, hence this handler will only be executed if the plugin is
--- configured as a global plugin!
-function plugin:rewrite(plugin_conf)
-
-  -- your custom code here
-  kong.log.debug("saying hi from the 'rewrite' handler")
-
-end --]]
-
-
-
--- runs in the 'access_by_lua_block'
 function serviceCallout:access(conf)
-
-  -- your custom code here
   kong.log.inspect(conf)   -- check the logs for a pretty-printed config!
   local client = http.new()
-  if(kong.request.get_header('sc-target') ~= nil and kong.request.get_header('sc-target') ~= ''){
-    local res, err = client:request_uri(kong.request.get_header('sc-target'), {
-      method = kong.request.get_header('sc-method'),
-      body = kong.request.get_header('sc-body'),
-    })
-    kong.response.set_header("service-callout-response",res.body)
-  }
-
+  
+  local res, err = client:request_uri(kong.request.get_header('sc-target'), {
+    method = kong.request.get_header('sc-method'),
+    body = kong.request.get_header('sc-body'),
+  })
+  kong.response.set_header("service-callout-response",res.body)
 end
 
 
