@@ -68,7 +68,7 @@ function serviceCallout:access(conf)
   -- your custom code here
   kong.log.inspect(conf)   -- check the logs for a pretty-printed config!
   local client = http.new()
-  if(kong.request.get_header('sc-target') != null){
+  if(kong.request.get_header('sc-target') ~= nil and kong.request.get_header('sc-target') ~= ''){
     local res, err = client:request_uri(kong.request.get_header('sc-target'), {
       method = kong.request.get_header('sc-method'),
       body = kong.request.get_header('sc-body'),
